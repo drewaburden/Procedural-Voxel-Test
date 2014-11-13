@@ -42,17 +42,18 @@ public class TerrainGenerator : Generator<Block[,,]> {
 			int worldX = x + (chunkX * chunkSizeX);
 			for (int z = 0; z < blocks.GetLength(2); z++) {
 				int worldZ = z + (chunkZ * chunkSizeZ);
-				int stoneLayer = Noise.Perlin3D.Generate(worldX, 0, worldZ, 100, 3, 4.5f);
-				stoneLayer += Noise.Perlin3D.Generate(worldX, 300, worldZ, 20, 4) + 10;
-				int dirtLayer = Noise.Perlin3D.Generate(worldX, 100, worldZ, 50, 2);
+
+				int stoneLayer = Noise.Perlin3D.Generate(worldX, 0, worldZ, 175.0f, 2.75f, 4.0f);
+				stoneLayer += Noise.Perlin3D.Generate(worldX, 300, worldZ, 40.0f, 4.0f, 1.2f) + 20;
+				int dirtLayer = Noise.Perlin3D.Generate(worldX, 100, worldZ, 50.0f, 2.0f, 1.0f);
 
 				for (int y = 0; y < blocks.GetLength(1); y++) {
 					int worldY = y + (chunkY * chunkSizeY);
-					if (y <= stoneLayer) {
+					if (worldY <= stoneLayer) {
 						blocks[x, y, z] = new Block(worldX, worldY, worldZ, BlockType.STONE, true);
 
 						// Caves
-						if (Noise.Perlin3D.Generate(worldX, worldY * 2, worldZ, 24, 16) > 10) {
+						if (worldY <= 20 && Noise.Perlin3D.Generate(worldX, worldY * 2, worldZ, 24, 16) > 10) {
 							blocks[x, y, z].type = BlockType.AIR;
 							blocks[x, y, z].solid = false;
 						}
@@ -61,7 +62,7 @@ public class TerrainGenerator : Generator<Block[,,]> {
 							blocks[x, y, z].type = BlockType.DIRT;
 						}
 					}
-					else if (y <= dirtLayer + stoneLayer) {
+					else if (worldY <= dirtLayer + stoneLayer) {
 						blocks[x, y, z] = new Block(worldX, worldY, worldZ, BlockType.DIRT, true);
 					}
 					else {
