@@ -13,7 +13,7 @@ public class CameraMovement : MonoBehaviour {
 	private float yRotation = 0.0f;
  
 	void Start() {
-		Screen.showCursor = false;
+		Screen.lockCursor = true;
 		xRotation = transform.eulerAngles.y;
 		yRotation = transform.eulerAngles.x;
 	}
