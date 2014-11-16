@@ -12,19 +12,14 @@ public class World : MonoBehaviour {
 
 	void Start() {
 		// Create the chunks
+		seedRand();
 		build();
 	}
 
 	void Update() {
 		if (regenerate) {
-			// Set up the seed for the random generation
-			if (seed == 0) {
-				Random.seed = (int) System.DateTime.Now.Ticks;
-				Noise.Perlin3D.seed = Random.Range(-50000, 50000);
-			}
-			else if (seed != Noise.Perlin3D.seed) Noise.Perlin3D.seed = seed;
-
 			destroy();
+			seedRand();
 			build();
 			regenerate = false;
 		}
@@ -57,5 +52,14 @@ public class World : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	private void seedRand() {
+		// If the seed is 0, assume that means to choose a random seed
+		if (seed == 0) {
+			Random.seed = (int) System.DateTime.Now.Ticks;
+			Noise.Perlin3D.seed = Random.Range(-50000, 50000);
+		}
+		else if (seed != Noise.Perlin3D.seed) Noise.Perlin3D.seed = seed;
 	}
 }
