@@ -41,10 +41,11 @@ public class TerrainGenerator : Generator<Block[,,]> {
 			for (int z = 0; z < blocks.GetLength(2); z++) {
 				int worldZ = z + (chunkZ * chunkSizeZ);
 
+				// Generate base stone/dirt layer values
 				int stoneLayer = Noise.Perlin3D.Generate(worldX, 0, worldZ, 175.0f, 2.75f, 4.0f)
 					+ Noise.Perlin3D.Generate(worldX, 300, worldZ, 40.0f, 4.0f, 1.2f)
 					+ heightOffset;
-				int dirtLayer = Noise.Perlin3D.Generate(worldX, 100, worldZ, 50.0f, 2.0f, 1.0f);
+				int dirtLayer = Noise.Perlin3D.Generate(worldX, 100, worldZ, 50.0f, 2.0f, 1.0f) + 1;
 
 				for (int y = 0; y < blocks.GetLength(1); y++) {
 					int worldY = y + (chunkY * chunkSizeY);
@@ -62,7 +63,7 @@ public class TerrainGenerator : Generator<Block[,,]> {
 							blocks[x, y, z].solid = false;
 						}
 						// Dirt patches
-						else if (Noise.Perlin3D.Generate(worldX, worldY, worldZ, 12, 16) > 10) {
+						else if (Noise.Perlin3D.Generate(worldX, worldY + worldY/2, worldZ, 24, 11, 1.2f) > 10) {
 							blocks[x, y, z].type = BlockType.DIRT;
 						}
 					}

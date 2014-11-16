@@ -242,9 +242,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   regenerate: 0
   seed: 0
-  numChunksX: 10
-  numChunksY: 5
-  numChunksZ: 10
+  numChunksX: 5
+  numChunksY: 3
+  numChunksZ: 5
   chunkPrefab: {fileID: 11400000, guid: 3c2c7a6dfbc0cbc42967492b3046383f, type: 2}
 --- !u!4 &1522048816
 Transform:
