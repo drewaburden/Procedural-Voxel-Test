@@ -9,24 +9,27 @@ public class World : MonoBehaviour {
 	public Chunk chunkPrefab;
 
 	private Chunk[,,] chunks;
+	private Coroutine buildRoutine;
 
 	void Start() {
 		// Create the chunks
-		seedRand();
-		build();
+		buildRoutine = StartCoroutine(build());
 	}
 
 	void Update() {
 		if (regenerate) {
+			if (buildRoutine != null) StopCoroutine(buildRoutine);
 			destroy();
 			seedRand();
-			build();
+			buildRoutine = StartCoroutine(build());
 			regenerate = false;
 		}
 	}
 
-	private void build() {
+	private IEnumerator build() {
 		chunks = new Chunk[numChunksX, numChunksY, numChunksZ];
+		int iteration = 0;
+		int totalLength = chunks.GetLength(0) * chunks.GetLength(1) * chunks.GetLength(2);
 		for (int x = 0; x < chunks.GetLength(0); ++x) {
 			for (int y = 0; y < chunks.GetLength(1); ++y) {
 				for (int z = 0; z < chunks.GetLength(2); ++z) {
@@ -39,9 +42,14 @@ public class World : MonoBehaviour {
 					chunks[x, y, z].x = x;
 					chunks[x, y, z].y = y;
 					chunks[x, y, z].z = z;
+					Debug.Log("Generating: " + Mathf.Clamp(Mathf.RoundToInt((float) ++iteration / totalLength * 100.0f), 0, 99) + "%");
+					yield return null;
 				}
 			}
 		}
+		Debug.Log("Generating: 100%");
+		buildRoutine = null;
+		yield break;
 	}
 
 	private void destroy() {
