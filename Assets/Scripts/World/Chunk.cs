@@ -13,10 +13,8 @@ public class Chunk : MonoBehaviour {
 	private Mesh mesh;
 	private MeshCollider collision;
 
-	void Start() {
+	void Awake() {
 		collision = GetComponent<MeshCollider>();
-
-		Generate();
 	}
 
 	public void Generate() {

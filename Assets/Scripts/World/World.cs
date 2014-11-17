@@ -21,7 +21,10 @@ public class World : MonoBehaviour {
 	}
 
 	void Update() {
-		if (regenerate) {
+		if (Input.GetAxisRaw("Regenerate") > 0.0f) {
+			regenerate = true;
+		}
+		else if (regenerate) {
 			StopCoroutine("build");
 			destroy();
 			seedRand();
@@ -48,6 +51,7 @@ public class World : MonoBehaviour {
 					chunks[x, y, z].x = x;
 					chunks[x, y, z].y = y;
 					chunks[x, y, z].z = z;
+					chunks[x, y, z].Generate();
 					generationProgress.SetPercent((float) ++iteration / totalLength);
 					yield return null;
 				}
