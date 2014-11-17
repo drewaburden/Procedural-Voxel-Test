@@ -531,7 +531,7 @@ RectTransform:
   - {fileID: 1916203671}
   m_Father: {fileID: 1431802594}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: .725000024}
+  m_AnchorMin: {x: 0, y: .699999988}
   m_AnchorMax: {x: .349999994, y: 1}
   m_AnchoredPosition: {x: 10, y: -10}
   m_SizeDelta: {x: -10, y: -10}
@@ -957,7 +957,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -30, y: -30}
+  m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1916203672
 MonoBehaviour:
@@ -988,17 +988,19 @@ MonoBehaviour:
 
     F1 - Toggle this controls display
 
-    w/s - Translate camera forward/back
+    W/S - Translate camera forward/back
 
-    a/d - Translate camera left/right
+    A/D - Translate camera left/right
 
-    space/ctrl - Translate camera up/down
+    Space/Ctrl - Translate camera up/down
 
-    Mouse x/y - Rotate camera
+    Mouse X/Y - Rotate camera
 
     Mouse 1 - Toggle flashlight
 
-    r - Generate new random world'
+    R - Generate new random world
+
+    Alt+F4 - Exit program'
 --- !u!222 &1916203673
 CanvasRenderer:
   m_ObjectHideFlags: 0

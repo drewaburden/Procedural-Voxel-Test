@@ -17,6 +17,7 @@ public class World : MonoBehaviour {
 
 	void Start() {
 		// Create the chunks
+		seedRand();
 		StartCoroutine("build");
 	}
 
