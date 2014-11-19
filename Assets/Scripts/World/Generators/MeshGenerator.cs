@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 public class MeshGenerator : Generator<Mesh> {
 	private Block[,,] blocks;
+	private Mesh mesh;
 	private List<Vector3> vertices;
 	private List<int> triangles;
 	private List<Vector2> uv;
-	private int faceCount;
-	private float tileFraction = 0.5f;
+	private int faceCount = 0; // Current number of faces in the overall mesh
+	private float tileFraction = 0.5f; // The fraction of the tilesheet one tile takes up (assumes all equally sized tiles)
 	private BlockUV uvMap_stone = new BlockUV(new Vector2(0, 1));
 	private BlockUV uvMap_dirt = new BlockUV(new Vector2(0, 0));
 	private BlockUV uvMap_grass = new BlockUV(new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0));
@@ -24,24 +26,45 @@ public class MeshGenerator : Generator<Mesh> {
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="blocks"></param>
-	/// <returns></returns>
-	public Mesh Generate() {
-		vertices = new List<Vector3>();
-		triangles = new List<int>();
-		uv = new List<Vector2>();
-		faceCount = 0;
+	public override IEnumerator Generate() {
+		Thread generationThread = new Thread(generation);
+		generationThread.Start();
+		yield return null;
 
-		Mesh mesh = new Mesh();
-		mesh.Clear();
-		buildMesh();
+		while (generationThread.IsAlive) yield return null;
+		
+		// Mesh
+		mesh = new Mesh();
 		mesh.vertices = vertices.ToArray();
+		yield return null;
 		mesh.triangles = triangles.ToArray();
+		yield return null;
 		mesh.uv = uv.ToArray();
+		yield return null;
 
+		// Prepare the mesh for use
+		mesh.Optimize();
+		yield return null;
+		mesh.RecalculateNormals();
+		yield return null;
+
+		Done();
+		yield break;
+	}
+
+	public override Mesh GetResult() {
 		return mesh;
 	}
 
+	private void generation() {
+		lock (_lock) {
+			vertices = new List<Vector3>();
+			triangles = new List<int>();
+			uv = new List<Vector2>();
+			faceCount = 0;
+			buildMesh();
+		}
+	}
 	/// <summary>
 	/// 
 	/// </summary>
@@ -56,14 +79,7 @@ public class MeshGenerator : Generator<Mesh> {
 						else if (blocks[x, y, z].type == BlockType.STONE) uvMap = uvMap_stone;
 						else uvMap = uvMap_stone;
 
-						generateVertices(x, y, z,
-							!isSolidAndExists(x, y + 1, z),
-							!isSolidAndExists(x, y - 1, z),
-							!isSolidAndExists(x - 1, y, z),
-							!isSolidAndExists(x + 1, y, z),
-							!isSolidAndExists(x, y, z - 1),
-							!isSolidAndExists(x, y, z + 1),
-							uvMap);
+						generateVertices(x, y, z, uvMap);
 					}
 				}
 			}
@@ -76,15 +92,10 @@ public class MeshGenerator : Generator<Mesh> {
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="z"></param>
-	/// <param name="top"></param>
-	/// <param name="bottom"></param>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <param name="front"></param>
-	/// <param name="back"></param>
-	/// <param name="type"></param>
-	private void generateVertices(int x, int y, int z, bool top, bool bottom, bool left, bool right, bool front, bool back, BlockUV uvMap) {
-		if (top) {
+	/// <param name="uvMap"></param>
+	private void generateVertices(int x, int y, int z, BlockUV uvMap) {
+		// Top
+		if (!isSolidAndExists(x, y + 1, z)) {
 			vertices.Add(new Vector3(x, y + 1, z + 1));
 			vertices.Add(new Vector3(x + 1, y + 1, z + 1));
 			vertices.Add(new Vector3(x + 1, y + 1, z));
@@ -92,7 +103,8 @@ public class MeshGenerator : Generator<Mesh> {
 			generateQuad();
 			generateUV(uvMap.texCoord_top);
 		}
-		if (bottom) {
+		// Bottom
+		if (!isSolidAndExists(x, y - 1, z)) {
 			vertices.Add(new Vector3(x, y, z));
 			vertices.Add(new Vector3(x + 1, y, z));
 			vertices.Add(new Vector3(x + 1, y, z + 1));
@@ -100,7 +112,8 @@ public class MeshGenerator : Generator<Mesh> {
 			generateQuad();
 			generateUV(uvMap.texCoord_bottom);
 		}
-		if (left) {
+		// Left
+		if (!isSolidAndExists(x - 1, y, z)) {
 			vertices.Add(new Vector3(x, y + 1, z + 1));
 			vertices.Add(new Vector3(x, y + 1, z));
 			vertices.Add(new Vector3(x, y, z));
@@ -108,7 +121,8 @@ public class MeshGenerator : Generator<Mesh> {
 			generateQuad();
 			generateUV(uvMap.texCoord_left);
 		}
-		if (right) {
+		// Right
+		if (!isSolidAndExists(x + 1, y, z)) {
 			vertices.Add(new Vector3(x + 1, y + 1, z));
 			vertices.Add(new Vector3(x + 1, y + 1, z + 1));
 			vertices.Add(new Vector3(x + 1, y, z + 1));
@@ -116,7 +130,8 @@ public class MeshGenerator : Generator<Mesh> {
 			generateQuad();
 			generateUV(uvMap.texCoord_right);
 		}
-		if (front) {
+		// Front
+		if (!isSolidAndExists(x, y, z - 1)) {
 			vertices.Add(new Vector3(x, y + 1, z));
 			vertices.Add(new Vector3(x + 1, y + 1, z));
 			vertices.Add(new Vector3(x + 1, y, z));
@@ -124,7 +139,8 @@ public class MeshGenerator : Generator<Mesh> {
 			generateQuad();
 			generateUV(uvMap.texCoord_front);
 		}
-		if (back) {
+		// Back
+		if (!isSolidAndExists(x, y, z + 1)) {
 			vertices.Add(new Vector3(x + 1, y + 1, z + 1));
 			vertices.Add(new Vector3(x, y + 1, z + 1));
 			vertices.Add(new Vector3(x, y, z + 1));
@@ -165,7 +181,7 @@ public class MeshGenerator : Generator<Mesh> {
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="z"></param>
-	/// <returns></returns>
+	/// <returns>True if a block exists at the specified coordinates and that block is solid. False otherwise.</returns>
 	private bool isSolidAndExists(int x, int y, int z) {
 		if (x >= 0 && y >= 0 && z >= 0
 			&& x < blocks.GetLength(0) && y < blocks.GetLength(1) && z < blocks.GetLength(2)

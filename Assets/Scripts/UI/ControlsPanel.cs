@@ -2,26 +2,18 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class ControlsPanel : MonoBehaviour {
-	public RectTransform panel;
-
-	private bool buttonDown = false;
+public class ControlsPanel : PanelController {
+	protected bool buttonDown = false; // Whether or not the button used to toggle the panel is currently being held down
 
 	void Update() {
+		// If the controls display panel's toggle button is down
 		if (Input.GetAxisRaw("Controls display") > 0.0f) {
 			buttonDown = true;
 		}
+		// If the toggle button is not down, but it was last frame
 		else if (buttonDown) {
+			Toggle();
 			buttonDown = false;
-			SetVisible(!panel.gameObject.activeSelf);
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="visible"></param>
-	public void SetVisible(bool visible) {
-		panel.gameObject.SetActive(visible);
 	}
 }

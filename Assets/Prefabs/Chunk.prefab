@@ -9,8 +9,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 33: {fileID: 3300000}
-  - 23: {fileID: 2300000}
   - 64: {fileID: 6400000}
+  - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
   m_Layer: 8
   m_Name: Chunk
@@ -69,7 +69,7 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_SmoothSphereCollisions: 0
-  m_Convex: 0
+  m_Convex: 1
   m_Mesh: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:

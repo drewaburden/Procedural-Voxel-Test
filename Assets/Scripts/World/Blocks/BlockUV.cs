@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Used to specify UV coordinates on a tilesheet texture.
+/// </summary>
 public class BlockUV {
 	public Vector2 texCoord_top, texCoord_bottom, texCoord_left, texCoord_right, texCoord_front, texCoord_back;
 
