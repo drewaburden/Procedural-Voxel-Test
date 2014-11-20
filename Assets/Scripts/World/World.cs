@@ -15,13 +15,17 @@ public class World : MonoBehaviour {
 
 	private Chunk[,,] chunks; // The Chunks that make up the World
 	private GenerationProgressPanel generationProgress; // The panel that displays the progress of the world generation
+	private SeedInput seedInput; // The panel that displays the current seed and allows the user to enter a new seed
 
 	void Awake() {
-		// Find the progress panel
 		generationProgress = FindObjectOfType<GenerationProgressPanel>();
+		seedInput = FindObjectOfType<SeedInput>();
 	}
 
 	void Start() {
+		seedInput.seed = seed;
+		seedInput.OnChanged += OnSeedChanged;
+
 		// Start generating the world
 		SeedRand();
 		StartCoroutine("build");
@@ -64,6 +68,14 @@ public class World : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="newSeed"></param>
+	public void OnSeedChanged(int newSeed) {
+		seed = newSeed;
+	}
+
+	/// <summary>
 	/// Seeds the random number generator and the perlin noise generator.
 	/// </summary>
 	/// <param name="seed">Seed value to use. If equal to zero, a random seed value is chosen. Values clamped between -50000 and 50000.</param>
@@ -72,13 +84,15 @@ public class World : MonoBehaviour {
 		// If the seed is 0, assume that means to choose a random seed
 		if (seed == 0) {
 			Random.seed = (int) System.DateTime.Now.Ticks;
-			Noise.Perlin3D.seed = Random.Range(-50000, 50000);
+			int randSeed = Random.Range(-50000, 50000);
+			Noise.Perlin3D.seed = randSeed;
+			seedInput.seed = randSeed;
 		}
 		// Otherwise, seed with the specified value
 		else if (seed != Noise.Perlin3D.seed) Noise.Perlin3D.seed = Mathf.Clamp(seed, -50000, 50000);
 	}
 
-	// Builds the world and updates the progress percentage
+	// Coroutine that builds the world and updates the progress percentage
 	private IEnumerator build() {
 		// Set up the progress panel
 		generationProgress.percent = 0.0f;
@@ -106,7 +120,7 @@ public class World : MonoBehaviour {
 					chunks[x, y, z].z = z;
 					yield return null;
 
-					// Begin generating the actual Chunk
+					// Begin generating the actual Chunk data, mesh, collision, etc.
 					chunks[x, y, z].Generate();
 					// Update the progress display
 					generationProgress.percent = ++iteration / (float) totalLength;
