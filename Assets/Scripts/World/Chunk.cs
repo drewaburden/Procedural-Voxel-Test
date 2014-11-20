@@ -44,7 +44,6 @@ public class Chunk : MonoBehaviour {
 	/// part of the generation process.
 	/// </summary>
 	public void OnTerrainGenDone() {
-		terrainGen.OnDone -= OnTerrainGenDone; // Remove this callback in case Generate() is called again later
 		blocks = terrainGen.GetResult();
 		
 		// Generate the mesh vertices, triangles, uv, normals, etc. in a coroutine
@@ -57,7 +56,6 @@ public class Chunk : MonoBehaviour {
 	/// part of the generation process.
 	/// </summary>
 	public void OnMeshGenDone() {
-		meshGen.OnDone -= OnMeshGenDone; // Remove this callback in case Generate() is called again later
 		filter.mesh = meshGen.GetResult();
 		
 		// Generate the collision vertices and triangles in a coroutine
@@ -69,7 +67,6 @@ public class Chunk : MonoBehaviour {
 	/// When the collision generation coroutine finishes, this method is called by an event so we can finalize the generation.
 	/// </summary>
 	public void OnCollisionGenDone() {
-		collisionGen.OnDone -= OnCollisionGenDone; // Remove this callback in case Generate() is called again later
 		collision = collisionGen.GetResult();
 	}
 

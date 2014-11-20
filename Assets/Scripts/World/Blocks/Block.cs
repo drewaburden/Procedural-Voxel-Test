@@ -7,13 +7,15 @@ using System.Collections;
 public class Block {
 	public int x, y, z; // Coordinates of the block in the entire worldspace
 	public BlockType type; // Type of the block
+	public bool visible; // Whether or not the block needs a mesh
 	public bool solid; // Whether or not the block needs collision
 
-	public Block(int x = 0, int y = 0, int z = 0, BlockType type = BlockType.AIR, bool solid = false) {
+	public Block(int x = 0, int y = 0, int z = 0, BlockType type = BlockType.AIR, bool visible = false, bool solid = false) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.type = type;
+		this.visible = visible;
 		this.solid = solid;
 	}
 }
